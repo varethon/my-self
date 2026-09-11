@@ -1,57 +1,42 @@
 # VARETHON ASCEND
 
-VARETHON ASCEND is a standalone Angular 22 personal operating system: Goal → Plan → Execute → Review. The app runs immediately in demo mode, and switches to Supabase Auth/Postgres when a public publishable key is supplied at runtime.
+VARETHON ASCEND là Angular 22 personal operating system: Goal → Plan → Execute → Review.
+Bản GitHub Pages chạy local-only, dùng một tài khoản hardcode duy nhất và lưu toàn bộ workspace trong localStorage của trình duyệt.
 
-## Run locally
+## Đăng nhập
+
+Trang login chỉ chấp nhận tài khoản cố định đã cấu hình trong `src/app/core/services/auth.service.ts`.
+Không có Supabase Auth, không có signup và không có API tạo tài khoản. Session chỉ là một cờ local trong trình duyệt.
+
+Vì đây là SPA tĩnh, thông tin hardcode có thể bị xem trong JavaScript build. Cấu hình chỉ phù hợp cho workspace cá nhân/demo, không dùng để bảo vệ dữ liệu nhạy cảm.
+
+## Chạy local
 
 ```bash
 npm install
 npm start
 ```
 
-Open `http://localhost:4200`. Demo mode accepts any email and a password with at least four characters. No private key is bundled in the frontend.
+Mở `http://localhost:4200`. Dữ liệu tạo trong app được lưu lại khi reload cùng trình duyệt. Xóa site data/localStorage để khôi phục workspace mẫu.
 
-Production configuration is loaded from `public/runtime-config.js`:
+## Kiến trúc local-only
 
-```js
-window.__VARETHON_CONFIG__ = {
-  supabaseUrl: 'https://qphzagsrntgjktnqiyaz.supabase.co',
-  supabasePublishableKey: 'your-public-publishable-key'
-};
-```
+- `AuthService` xác thực username/password cố định và điều hướng thẳng vào Dashboard.
+- `WorkspaceStore` là nguồn dữ liệu duy nhất cho goals, milestones, plans, tasks, calendar, habits, focus và reviews.
+- AI Coach dùng deterministic scheduler local với quy trình Preview → Approve; không gọi Gemini hay Supabase Edge Functions.
+- GitHub Pages workflow chỉ build Angular, tạo `404.html` cho deep link và deploy artifact thực tế.
 
-## Supabase
+## Backend dự phòng
 
-The migration set is additive and ordered in `supabase/migrations/`. It creates the domain tables, enables RLS on every private table, validates ownership of relationships, protects active calendar intervals with a PostgreSQL exclusion constraint, and exposes only the two authenticated atomic RPCs:
+Các migrations và Edge Functions trong `supabase/` được giữ lại như backend artifact của kiến trúc ban đầu. Bản static local-only không khởi tạo Supabase client, không đọc runtime key và không gọi backend này.
 
-- `accept_ai_schedule_batch`
-- `complete_focus_session`
-
-With the Supabase CLI authenticated, inspect the linked project before applying migrations, then push without resetting data:
-
-```bash
-npx supabase login
-npx supabase link --project-ref qphzagsrntgjktnqiyaz
-npx supabase migration list
-npx supabase db push
-npx supabase functions deploy ai-schedule
-npx supabase functions deploy accept-ai-schedule
-npx supabase functions deploy ai-breakdown-goal
-npx supabase functions deploy ai-review
-npx supabase functions deploy ai-reschedule
-npx supabase secrets set GEMINI_API_KEY=... GEMINI_MODEL=gemini-3.8-flash
-```
-
-The Edge Functions use JWT authentication, Zod payload validation, deterministic candidate generation, Gemini selection with a deterministic fallback, and the safe Preview → Approve → RPC revalidation flow.
-
-## Verify
+## Kiểm thử
 
 ```bash
 npm run build
 npm test -- --watch=false
+npm run e2e
 npm audit --audit-level=high
 ```
-
-The GitHub Pages workflow in `.github/workflows/pages.yml` derives the repository base href, generates `404.html` for deep links, injects only the public Supabase runtime configuration, and uploads the actual build output. Configure `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` as GitHub Actions variables; keep `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `GEMINI_API_KEY`, and `GH_TOKEN` as secrets or runtime environment values only.
 # my-self
 # my-self

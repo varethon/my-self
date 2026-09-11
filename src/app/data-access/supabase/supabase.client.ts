@@ -1,14 +1,8 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { appConfig, isSupabaseConfigured } from '../../core/config/app-config';
-
-let client: SupabaseClient | null = null;
-
-export function getSupabaseClient(): SupabaseClient | null {
-  if (!isSupabaseConfigured()) {
-    return null;
-  }
-  client ??= createClient(appConfig.supabaseUrl, appConfig.supabasePublishableKey, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
-  });
-  return client;
+/**
+ * Supabase is intentionally disabled for the static local-only build.
+ * Migrations and Edge Functions remain backend artifacts, but this app never
+ * creates a client or opens an authentication session.
+ */
+export function getSupabaseClient(): null {
+  return null;
 }

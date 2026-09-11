@@ -27,12 +27,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Inject public runtime configuration
-        env:
-          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
-        run: |
-          node -e "const fs=require('fs'); const url=process.env.SUPABASE_URL || 'https://qphzagsrntgjktnqiyaz.supabase.co'; const key=process.env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_Itiu9sPDNN60lfSExFkuWw_HvU5x47e'; fs.writeFileSync('public/runtime-config.js', 'window.__VARETHON_CONFIG__ = ' + JSON.stringify({supabaseUrl:url,supabasePublishableKey:key}) + ';\\n');"
       - name: Resolve GitHub Pages base href
         id: pages-path
         run: |
@@ -45,16 +39,16 @@ jobs:
         run: npm run build -- --configuration production --base-href="${{ steps.pages-path.outputs.base }}"
       - name: Verify artifact and deep-link fallback
         run: |
-          test -f dist/varethon-ascend/index.html
-          cp dist/varethon-ascend/index.html dist/varethon-ascend/404.html
-          test -f dist/varethon-ascend/404.html
-          if grep -R -n -E 'SUPABASE_SERVICE_ROLE_KEY|SUPABASE_DB_PASSWORD|GEMINI_API_KEY=[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{20,}' dist/varethon-ascend; then exit 1; fi
+          test -f dist/varethon-ascend/browser/index.html
+          cp dist/varethon-ascend/browser/index.html dist/varethon-ascend/browser/404.html
+          test -f dist/varethon-ascend/browser/404.html
+          if grep -R -n --include='*.js' --include='*.css' --include='*.html' -E 'SUPABASE_SERVICE_ROLE_KEY|SUPABASE_DB_PASSWORD|GEMINI_API_KEY=[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{20,}|AIzaSy[A-Za-z0-9_-]{20,}' dist/varethon-ascend/browser; then exit 1; fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/varethon-ascend
+          path: dist/varethon-ascend/browser
 
   deploy:
     needs: build

@@ -1,5 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
-import { getSupabaseClient } from '../supabase/supabase.client';
 import { Task } from '../../shared/models/domain';
 
 export interface TaskDto {
@@ -44,12 +42,7 @@ export function mapTaskDto(dto: TaskDto): Task {
 }
 
 export class TaskRepository {
-  private readonly client: SupabaseClient | null = getSupabaseClient();
-
   async listOpen(): Promise<{ data: Task[]; error?: string }> {
-    if (!this.client) return { data: [] };
-    const result = await this.client.from('tasks').select('*').not('status', 'in', '(done,cancelled,skipped)').order('priority').order('deadline', { ascending: true, nullsFirst: false });
-    if (result.error) return { data: [], error: result.error.message };
-    return { data: (result.data as unknown as TaskDto[]).map(mapTaskDto) };
+    return { data: [] };
   }
 }

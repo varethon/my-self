@@ -14,14 +14,13 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="eyebrow">PERSONAL OPERATING SYSTEM</div>
         <h1>Biến mục tiêu thành <em>đà tiến bộ.</em></h1>
         <p class="auth-intro">Một workspace có chủ đích cho kế hoạch, lịch thực thi và những lần review giúp bạn tiến xa hơn.</p>
-        @if (auth.demoMode) { <div class="demo-banner"><span>✦</span> Demo mode đang bật — nhập bất kỳ email và mật khẩu từ 6 ký tự để trải nghiệm.</div> }
         <form [formGroup]="form" (ngSubmit)="submit()">
-          <label>Email<input type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" /></label>
+          <label>Tài khoản<input type="text" formControlName="username" placeholder="Tên tài khoản" autocomplete="username" /></label>
           <label>Mật khẩu<input type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" /></label>
           @if (error()) { <p class="form-error" role="alert">{{ error() }}</p> }
-          <button class="primary-button full-width" type="submit" [disabled]="form.invalid || loading()">{{ loading() ? 'Đang xử lý…' : mode() === 'signIn' ? 'Mở workspace' : 'Tạo tài khoản' }} <span>→</span></button>
+          <button class="primary-button full-width" type="submit" [disabled]="form.invalid || loading()">{{ loading() ? 'Đang kiểm tra…' : 'Mở workspace' }} <span>→</span></button>
         </form>
-        <button class="auth-switch" type="button" (click)="mode.set(mode() === 'signIn' ? 'signUp' : 'signIn'); error.set('')">{{ mode() === 'signIn' ? 'Chưa có tài khoản? Đăng ký' : 'Đã có tài khoản? Đăng nhập' }}</button>
+        <p class="auth-note">Workspace cá nhân · chỉ tài khoản được cấp quyền mới có thể truy cập.</p>
         <div class="auth-footer"><span>VARETHON ASCEND · v1.0</span><span>Goal → Plan → Execute → Review</span></div>
       </section>
     </main>
@@ -29,10 +28,9 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LoginPage {
   private readonly fb = inject(FormBuilder);
-  readonly mode = signal<'signIn' | 'signUp'>('signIn');
   readonly loading = signal(false);
   readonly error = signal('');
-  readonly form = this.fb.nonNullable.group({ email: ['', [Validators.required, Validators.email]], password: ['', [Validators.required, Validators.minLength(6)]] });
+  readonly form = this.fb.nonNullable.group({ username: ['', Validators.required], password: ['', Validators.required] });
 
   constructor(readonly auth: AuthService) {}
 
@@ -40,7 +38,7 @@ export class LoginPage {
     if (this.form.invalid) return;
     this.loading.set(true); this.error.set('');
     const value = this.form.getRawValue();
-    const result = this.mode() === 'signIn' ? await this.auth.signIn(value.email, value.password) : await this.auth.signUp(value.email, value.password);
+    const result = await this.auth.signIn(value.username, value.password);
     this.error.set(result.error ?? ''); this.loading.set(false);
   }
 }

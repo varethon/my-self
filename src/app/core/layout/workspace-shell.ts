@@ -25,7 +25,7 @@ import { NavItem } from '../../shared/models/domain';
         <div class="sidebar-spacer"></div>
         <a class="nav-item" routerLink="/app/settings" routerLinkActive="active"><span class="nav-icon">⚙</span><span>Cài đặt</span></a>
         <button class="profile-chip" type="button" (click)="logout()">
-          <span class="avatar">{{ initials }}</span><span class="profile-copy"><strong>{{ auth.email() || 'Demo user' }}</strong><small>Đăng xuất</small></span><span class="logout-arrow">↗</span>
+          <span class="avatar">{{ initials }}</span><span class="profile-copy"><strong>{{ auth.username() || 'ASCEND user' }}</strong><small>Đăng xuất</small></span><span class="logout-arrow">↗</span>
         </button>
       </aside>
 
@@ -59,7 +59,7 @@ export class WorkspaceShell {
     { label: 'AI Coach', icon: '✧', route: '/app/ai' },
   ];
   readonly mobileItems = this.navItems.slice(0, 5);
-  get initials(): string { return (this.auth.email() || 'VA').slice(0, 2).toUpperCase(); }
+  get initials(): string { return (this.auth.username() || 'VA').slice(0, 2).toUpperCase(); }
 
   constructor(readonly auth: AuthService) {}
 

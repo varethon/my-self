@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { LoginPage } from './features/auth/login.page';
-import { OnboardingPage } from './features/auth/onboarding.page';
 import { WorkspaceShell } from './core/layout/workspace-shell';
 import { DashboardPage } from './features/dashboard/dashboard.page';
 import { GoalsPage } from './features/goals/goals.page';
@@ -18,7 +17,7 @@ import { SettingsPage } from './features/settings/settings.page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
-  { path: 'onboarding', component: OnboardingPage, canActivate: [authGuard] },
+  { path: 'onboarding', redirectTo: 'app/dashboard', pathMatch: 'full' },
   {
     path: 'app', component: WorkspaceShell, canActivate: [authGuard], children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },

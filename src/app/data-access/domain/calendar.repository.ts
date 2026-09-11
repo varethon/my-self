@@ -1,5 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
-import { getSupabaseClient } from '../supabase/supabase.client';
 import { CalendarEvent } from '../../shared/models/domain';
 
 export interface CalendarEventDto {
@@ -22,12 +20,9 @@ export function mapCalendarEventDto(dto: CalendarEventDto): CalendarEvent {
 }
 
 export class CalendarRepository {
-  private readonly client: SupabaseClient | null = getSupabaseClient();
-
   async listActive(from: string, to: string): Promise<{ data: CalendarEvent[]; error?: string }> {
-    if (!this.client) return { data: [] };
-    const result = await this.client.from('calendar_events').select('*').eq('status', 'active').lt('start_at', to).gt('end_at', from).order('start_at');
-    if (result.error) return { data: [], error: result.error.message };
-    return { data: (result.data as unknown as CalendarEventDto[]).map(mapCalendarEventDto) };
+    void from;
+    void to;
+    return { data: [] };
   }
 }

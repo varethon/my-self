@@ -1,19 +1,18 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('VARETHON ASCEND demo smoke', () => {
+test.describe('VARETHON ASCEND local-only smoke', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/runtime-config.js', async (route) => route.fulfill({ contentType: 'application/javascript', body: "window.__VARETHON_CONFIG__={supabaseUrl:'https://qphzagsrntgjktnqiyaz.supabase.co',supabasePublishableKey:''};" }));
     await page.goto('/login');
     await page.evaluate(() => localStorage.clear());
     await page.reload();
   });
 
-  test('login → onboarding → goal → milestone → task → conflict-safe calendar → AI preview → focus → habit → review → deep link → logout', async ({ page }) => {
-    await page.getByLabel('Email').fill('smoke@example.com');
-    await page.getByLabel('Mật khẩu').fill('smoke-pass');
+  test('login → goal → milestone → task → conflict-safe calendar → AI preview → focus → habit → review → deep link → logout', async ({ page }) => {
+    await page.getByLabel('Tài khoản').fill('daovanhung');
+    await page.getByLabel('Mật khẩu').fill('0346782752');
     await page.getByRole('button', { name: /Mở workspace/ }).click();
-    await expect(page).toHaveURL(/onboarding/);
-    await page.getByRole('button', { name: /Bắt đầu workspace/ }).click();
+    await expect(page).toHaveURL(/app\/dashboard/);
+    await page.goto('/onboarding');
     await expect(page).toHaveURL(/app\/dashboard/);
 
     await page.getByRole('link', { name: 'Mục tiêu' }).click();
@@ -27,6 +26,8 @@ test.describe('VARETHON ASCEND demo smoke', () => {
     await page.getByRole('button', { name: /Task mới/ }).click();
     await page.getByLabel('Tên task').fill('Smoke task');
     await page.getByRole('button', { name: 'Thêm vào backlog' }).click();
+    await expect(page.getByText('Smoke task')).toBeVisible();
+    await page.reload();
     await expect(page.getByText('Smoke task')).toBeVisible();
 
     await page.getByRole('link', { name: 'Lịch' }).click();
@@ -54,8 +55,16 @@ test.describe('VARETHON ASCEND demo smoke', () => {
     await expect(page.getByText(/Review đã lưu/)).toBeVisible();
 
     await page.goto('/app/analytics');
-    await expect(page.getByText('Analytics')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Analytics rõ ràng.' })).toBeVisible();
     await page.getByRole('button', { name: /Đăng xuất/ }).click();
     await expect(page).toHaveURL(/login/);
+  });
+
+  test('rejects invalid credentials and exposes no signup flow', async ({ page }) => {
+    await page.getByLabel('Tài khoản').fill('wrong-user');
+    await page.getByLabel('Mật khẩu').fill('wrong-password');
+    await page.getByRole('button', { name: /Mở workspace/ }).click();
+    await expect(page.getByRole('alert')).toHaveText('Tài khoản hoặc mật khẩu không đúng.');
+    await expect(page.getByText(/Đăng ký|Tạo tài khoản/)).toHaveCount(0);
   });
 });
