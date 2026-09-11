@@ -130,6 +130,10 @@ export class WorkspaceStore {
     this.persist();
   }
 
+  async refresh(): Promise<void> {
+    await this.hydrateRemote();
+  }
+
   private setState(state: WorkspaceSnapshot): void {
     this.lifeAreas.set(state.lifeAreas); this.goals.set(state.goals); this.monthlyPlans.set(state.monthlyPlans); this.tasks.set(state.tasks); this.events.set(state.events); this.habits.set(state.habits); this.focusSessions.set(state.focusSessions);
   }

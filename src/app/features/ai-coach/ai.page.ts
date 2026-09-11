@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { WorkspaceStore } from '../../core/services/workspace-store.service';
+import { AiCoachRepository } from '../../data-access/domain/ai-coach.repository';
 import { CandidateSlot, generateCandidateSlots } from '../../shared/utils/scheduler';
 
 @Component({
@@ -17,13 +18,34 @@ import { CandidateSlot, generateCandidateSlots } from '../../shared/utils/schedu
   `,
 })
 export class AiPage {
+  private readonly ai = inject(AiCoachRepository);
   readonly proposals = signal<CandidateSlot[]>([]);
+  readonly batchId = signal<string | undefined>(undefined);
   readonly coachMessage = signal('');
   readonly loading = signal(false);
   readonly Math = Math;
   constructor(readonly store: WorkspaceStore) {}
-  schedule(): void { this.loading.set(true); setTimeout(() => { const from = new Date(); from.setHours(8, 0, 0, 0); this.proposals.set(generateCandidateSlots(this.store.openTasks(), this.store.events(), from, 5).slice(0, 4)); this.loading.set(false); }, 450); }
-  approve(): void { for (const proposal of this.proposals()) { this.store.addEvent({ taskId: proposal.taskId, title: `Study · ${this.taskTitle(proposal.taskId)}`, eventType: 'study', source: 'ai', startAt: proposal.startAt, endAt: proposal.endAt, isLocked: false, isFlexible: true, blocksTime: true }); } this.proposals.set([]); this.coachMessage.set('Đã duyệt proposal. Các session đã qua conflict check lần hai và xuất hiện trong lịch.'); }
+  async schedule(): Promise<void> {
+    this.loading.set(true); this.coachMessage.set(''); this.batchId.set(undefined);
+    if (this.ai.available) {
+      const result = await this.ai.schedule(7);
+      if (result.error) this.coachMessage.set(`Không gọi được AI gateway: ${result.error}`);
+      if (result.data) { this.proposals.set(result.data.proposals); this.batchId.set(result.data.batchId); }
+      this.loading.set(false); return;
+    }
+    setTimeout(() => { const from = new Date(); from.setHours(8, 0, 0, 0); this.proposals.set(generateCandidateSlots(this.store.openTasks(), this.store.events(), from, 5).slice(0, 4)); this.loading.set(false); }, 450);
+  }
+  async approve(): Promise<void> {
+    const batchId = this.batchId();
+    if (batchId) {
+      const result = await this.ai.accept(batchId);
+      if (result.error) { this.coachMessage.set(`Không thể duyệt proposal: ${result.error}`); return; }
+      await this.store.refresh();
+    } else {
+      for (const proposal of this.proposals()) this.store.addEvent({ taskId: proposal.taskId, title: `Study · ${this.taskTitle(proposal.taskId)}`, eventType: 'study', source: 'ai', startAt: proposal.startAt, endAt: proposal.endAt, isLocked: false, isFlexible: true, blocksTime: true });
+    }
+    this.proposals.set([]); this.batchId.set(undefined); this.coachMessage.set('Đã duyệt proposal. Các session đã qua conflict check lần hai và xuất hiện trong lịch.');
+  }
   taskTitle(id: string): string { return this.store.tasks().find((task) => task.id === id)?.title ?? 'Task không xác định'; }
   dateLabel(value: string): string { return new Intl.DateTimeFormat('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' }).format(new Date(value)); }
   timeLabel(value: string): string { return new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value)); }
