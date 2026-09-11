@@ -54,3 +54,4 @@ npm audit --audit-level=high
 
 The GitHub Pages workflow in `.github/workflows/pages.yml` derives the repository base href, generates `404.html` for deep links, injects only the public Supabase runtime configuration, and uploads the actual build output. Configure `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` as GitHub Actions variables; keep `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `GEMINI_API_KEY`, and `GH_TOKEN` as secrets or runtime environment values only.
 # my-self
+# my-self
