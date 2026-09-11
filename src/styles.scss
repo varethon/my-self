@@ -262,6 +262,7 @@ option { color: #12201e; }
 .auth-card form .primary-button { margin-top: 5px; }
 .demo-banner { display: flex; gap: 9px; margin-bottom: 16px; padding: 11px; border: 1px solid rgba(185,165,255,.25); border-radius: 8px; color: var(--violet); background: rgba(185,165,255,.07); font-size: 11px; }
 .auth-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 25px; color: var(--dim); font: 9px monospace; }
+.auth-switch { width: 100%; margin-top: 13px; border: 0; color: var(--cyan); background: transparent; font-size: 12px; }
 .auth-orbit { position: absolute; width: 450px; height: 450px; border: 1px solid rgba(93,227,219,.09); border-radius: 50%; }.orbit-one { top: -220px; right: -160px; }.orbit-two { bottom: -260px; left: -160px; border-color: rgba(185,165,255,.08); }
 
 @media (max-width: 390px) { .auth-page { padding: 12px; }.auth-card { padding: 26px 20px; }.auth-brand { padding-bottom: 35px; }.auth-footer { display: grid; } }
