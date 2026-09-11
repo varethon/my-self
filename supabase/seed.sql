@@ -1,0 +1,2 @@
+-- Private workspace data is created by create_default_workspace() after authentication.
+-- This file intentionally contains no user-owned seed rows.
