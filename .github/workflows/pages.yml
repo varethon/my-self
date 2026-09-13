@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
@@ -40,6 +42,9 @@ jobs:
       - name: Verify artifact and deep-link fallback
         run: |
           test -f dist/varethon-ascend/browser/index.html
+          test -f dist/varethon-ascend/browser/courses/manifest.json
+          test "$(find dist/varethon-ascend/browser/courses -type f -name '*.mp4' | wc -l)" -ge 1
+          test "$(find dist/varethon-ascend/browser/courses -type f -name '*.mp4' -size +1M | wc -l)" -ge 1
           cp dist/varethon-ascend/browser/index.html dist/varethon-ascend/browser/404.html
           test -f dist/varethon-ascend/browser/404.html
           if grep -R -n --include='*.js' --include='*.css' --include='*.html' -E 'SUPABASE_SERVICE_ROLE_KEY|SUPABASE_DB_PASSWORD|GEMINI_API_KEY=[A-Za-z0-9_-]{12,}|ghp_[A-Za-z0-9]{20,}|AIzaSy[A-Za-z0-9_-]{20,}' dist/varethon-ascend/browser; then exit 1; fi

@@ -25,7 +25,7 @@ import { NavItem } from '../../shared/models/domain';
         <div class="sidebar-spacer"></div>
         <a class="nav-item" routerLink="/app/settings" routerLinkActive="active"><span class="nav-icon">⚙</span><span>Cài đặt</span></a>
         <button class="profile-chip" type="button" (click)="logout()">
-          <span class="avatar">{{ initials }}</span><span class="profile-copy"><strong>{{ auth.username() || 'ASCEND user' }}</strong><small>Đăng xuất</small></span><span class="logout-arrow">↗</span>
+          <span class="avatar">VA</span><span class="profile-copy"><strong>Không gian cá nhân</strong><small>Đăng xuất</small></span><span class="logout-arrow">↗</span>
         </button>
       </aside>
 
@@ -53,13 +53,13 @@ export class WorkspaceShell {
     { label: 'Lịch', icon: '◷', route: '/app/calendar' },
     { label: 'Thói quen', icon: '✦', route: '/app/habits' },
     { label: 'Focus', icon: '◉', route: '/app/focus' },
+    { label: 'Khóa học', icon: '▶', route: '/app/courses' },
     { label: 'Learning', icon: '⌁', route: '/app/learning' },
     { label: 'Reviews', icon: '↻', route: '/app/reviews' },
     { label: 'Analytics', icon: '↗', route: '/app/analytics' },
     { label: 'AI Coach', icon: '✧', route: '/app/ai' },
   ];
-  readonly mobileItems = this.navItems.slice(0, 5);
-  get initials(): string { return (this.auth.username() || 'VA').slice(0, 2).toUpperCase(); }
+  readonly mobileItems = [this.navItems[0], this.navItems[3], this.navItems[4], this.navItems[7], this.navItems[5]];
 
   constructor(readonly auth: AuthService) {}
 

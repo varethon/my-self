@@ -10,6 +10,7 @@ import { CalendarPage } from './features/calendar/calendar.page';
 import { HabitsPage } from './features/habits/habits.page';
 import { FocusPage } from './features/focus/focus.page';
 import { LearningPage } from './features/learning/learning.page';
+import { CoursesPage } from './features/courses/courses.page';
 import { ReviewsPage } from './features/reviews/reviews.page';
 import { AnalyticsPage } from './features/analytics/analytics.page';
 import { AiPage } from './features/ai-coach/ai.page';
@@ -29,6 +30,7 @@ export const routes: Routes = [
       { path: 'habits', component: HabitsPage },
       { path: 'focus', component: FocusPage },
       { path: 'learning', component: LearningPage },
+      { path: 'courses', component: CoursesPage },
       { path: 'reviews', component: ReviewsPage },
       { path: 'analytics', component: AnalyticsPage },
       { path: 'ai', component: AiPage },

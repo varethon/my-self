@@ -46,6 +46,7 @@ __screenshots__/
 supabase/.temp/
 playwright-report/
 test-results/
+/public/courses/manifest.json
 
 # System files
 .DS_Store
